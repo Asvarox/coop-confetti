@@ -1,9 +1,11 @@
 import type * as Party from "partykit/server";
 
-interface MessageConfetti {
-  type: "confetti";
+export interface MessageConfetti {
+    type: "confetti";
     x: number;
     y: number;
+    angle: number,
+    distance: number,
 }
 
 export type Message = MessageConfetti;

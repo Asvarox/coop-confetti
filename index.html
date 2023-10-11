@@ -1,14 +1,21 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="icon" type="image/svg+xml" href="/vite.svg"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Cooperative Confetti</title>
+    <link rel="stylesheet" href="./src/splash.css"/>
     <script type="module" src="/src/coop-confetti.ts"></script>
-  </head>
-  <body>
+</head>
+<body>
+<div style="z-index: 10000000">
     Add confetti to any page - just drag this link to your bookmarks bar:
-    <a href="javascript:(function(){var script=document.createElement('script');script.type='module';script.src='%VITE_APP_HOST_PAGE%/assets/coop-confetti.js';document.body.appendChild(script);})();">Coop Confetti</a>
-  </body>
+    <span><a
+            href="javascript:(function(){var script=document.createElement('script');script.type='module';script.src='%VITE_APP_HOST_PAGE%/assets/coop-confetti.js';document.body.appendChild(script);})();">Confetti 🎉</a></span>
+</div>
+<div>
+    Then click the bookmark to add confetti to the page you're on! 🎉
+</div>
+</body>
 </html>

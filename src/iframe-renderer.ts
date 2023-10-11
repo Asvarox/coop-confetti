@@ -1,9 +1,10 @@
 import {css, html, LitElement, PropertyValues} from 'lit'
 import {customElement, state} from 'lit/decorators.js'
 import PartySocket from "partysocket";
-import {Message} from "../party/index.ts";
+import {Message, MessageConfetti} from "../party/index.ts";
 import {sha1} from "./utils/hash.ts";
 import {confetti as confettiEmitter} from 'tsparticles-confetti';
+import {calculateVelocity} from "./config.ts";
 
 /**
  * An example element.
@@ -47,17 +48,16 @@ export class IframeRenderer extends LitElement {
 
         if (message.type === "confetti") {
             this.partySocket?.send(JSON.stringify(message));
-            this._addConfetti(message.x, message.y);
+            this._addConfetti(message);
         }
     }
 
     private _onMessageEvent = (event: MessageEvent<string>) => {
         try {
-            console.log('wsMessage', event.data);
             const message: Message = JSON.parse(event.data);
 
             if (message.type === "confetti") {
-                this._addConfetti(message.x, message.y);
+                this._addConfetti(message);
             }
         } catch (e) {
             console.warn("Failed to parse message", e, e);
@@ -68,9 +68,13 @@ export class IframeRenderer extends LitElement {
         return html``
     }
 
-    private _addConfetti(x: number, y: number) {
+    private _addConfetti({x, y, angle, distance }: MessageConfetti) {
+        const velocity = calculateVelocity(distance);
         confettiEmitter({
-            spread: 70,
+            spread: 20 + velocity,
+            particleCount: 3 * velocity,
+            angle,
+            startVelocity: velocity,
             origin: {x: (x - window.scrollX) / window.innerWidth, y: (y - window.scrollY) / window.innerHeight}
         });
     }

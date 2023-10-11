@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite build --mode=preview --watch"
+    "preview": "vite build --mode=preview --watch",
+    "deploy": "npm run build && gh-pages -d dist"
   },
   "dependencies": {
     "lit": "^2.7.6",
@@ -14,6 +15,7 @@
     "tsparticles-confetti": "^2.12.0"
   },
   "devDependencies": {
+    "gh-pages": "^6.0.0",
     "partykit": "0.0.30",
     "typescript": "^5.0.2",
     "vite": "^4.4.5"
