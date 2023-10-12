@@ -1,6 +1,7 @@
-import {css, html, LitElement, PropertyValues} from 'lit'
+import {css, html, LitElement, PropertyValues, svg} from 'lit'
 import {customElement, query, state} from 'lit/decorators.js'
 import {MessageConfetti} from "../party";
+import {calculateVelocity, MAX_DISTANCE} from "./config.ts";
 
 function calculateDistanceAndAngle(x1: number, y1: number, x2: number, y2: number) {
     // Calculating differential
@@ -34,6 +35,9 @@ export class CoopConfetti extends LitElement {
 
     @state()
     private dragging = false;
+    @state()
+    private currentPosition: { x: number, y: number } | null = null;
+
     private initialPoint: { x: number, y: number } | null = null;
 
     protected async firstUpdated(_changedProperties: PropertyValues) {
@@ -47,9 +51,33 @@ export class CoopConfetti extends LitElement {
     render() {
         return html`
             <button @click="${this._toggleEnabled}" class="${this._enabled ? 'enabled' : 'disabled'}">🎉</button>
-            <svg @mousedown="${this._mouseDown}" @mouseup="${this._mouseUp}" width="${window.innerWidth}"
+            <svg @mousedown="${this._mouseDown}" @mouseup="${this._mouseUp}" @mousemove="${this._mouseMove}"
+                 width="${window.innerWidth}"
                  height="${window.innerHeight}"
-                 style="pointer-events: ${this._enabled ? 'initial' : 'none'}"></svg>
+                 style="pointer-events: ${this._enabled ? 'initial' : 'none'}"
+            >
+                ${this.dragging ? (() => {
+                    if (this.initialPoint && this.currentPosition) {
+                        const {distance} = calculateDistanceAndAngle(this.currentPosition.x, this.currentPosition.y, this.initialPoint.x, this.initialPoint.y);
+                        return svg`
+                            <mask id="circle-mask">
+                                <rect width="${window.innerWidth}" height="${window.innerHeight}" fill="white"/> 
+                                <circle cx="${this.initialPoint.x}" cy="${this.initialPoint.y}" r="${calculateVelocity(distance)}" fill="black" />
+                            </mask>
+                            <circle cx="${this.initialPoint.x}" cy="${this.initialPoint.y}" r="${calculateVelocity(distance)}" style="stroke:rgb(0,0,0);stroke-width:2;fill: transparent" />
+                            <circle cx="${this.initialPoint.x}" cy="${this.initialPoint.y}" r="${calculateVelocity(distance)}" style="stroke:${distance >= MAX_DISTANCE ? 'rgb(255,0,0)':'rgb(255,255,255)'};stroke-width:1;fill: transparent" />
+                            <g mask="url(#circle-mask)">
+                                <line x1="${this.initialPoint.x}" y1="${this.initialPoint.y}" x2="${this.currentPosition.x}"
+                                      y2="${this.currentPosition.y}"
+                                      style="stroke:rgb(0,0,0);stroke-width:2"/>
+                                <line x1="${this.initialPoint.x}" y1="${this.initialPoint.y}" x2="${this.currentPosition.x}"
+                                      y2="${this.currentPosition.y}"
+                                      style="stroke:rgb(255,255,255);stroke-width:1"/>
+                            </g>`;
+                        
+                    }
+                })() : ''}
+            </svg>
             <iframe src="${import.meta.env.VITE_APP_HOST_PAGE}/iframe.html?url=${encodeURIComponent(window.location.href)}"
                     width="500" height="500" style="inset: 0;pointer-events: none" allowtransparency="true"/>
         `
@@ -68,8 +96,13 @@ export class CoopConfetti extends LitElement {
         }
     }
 
+    private _mouseMove(e: MouseEvent) {
+        if (this.dragging) {
+            this.currentPosition = {x: e.clientX, y: e.clientY};
+        }
+    }
+
     private _mouseUp(e: MouseEvent) {
-        this.dragging = false;
         if (this._enabled) {
             e.preventDefault();
             e.stopPropagation();
@@ -90,6 +123,8 @@ export class CoopConfetti extends LitElement {
                 this.iframe!.contentWindow?.postMessage(JSON.stringify(payload), '*');
             }
         }
+        this.dragging = false;
+        this.initialPoint = this.currentPosition = null;
     }
 
     static styles = css`
