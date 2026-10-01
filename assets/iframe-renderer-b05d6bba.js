@@ -89,7 +89,7 @@
                         `)}
                 </div>
                 <div style="display: flex; gap: 1rem;">
-                    ${["Small","Medium","Large","Extra Large","❓","☕","Skip"].map(s=>W`
+                    ${["Small (1)","Medium (3)","Large (5)","Extra Large (8)","❓","☕","Skip"].map(s=>W`
                             <button style="padding: 1rem;font-size: 2rem;${this._estimate===s?"background: lightgreen;":""}" @click="${()=>this.setEstimate(s)}" ?disabled="${this._revealed}">${s}</button>
                         `)}
                     <button style="padding: 1rem;font-size: 2rem;" @click="${()=>this.setEstimate(null)}" ?disabled="${this._revealed}">Reset</button>
